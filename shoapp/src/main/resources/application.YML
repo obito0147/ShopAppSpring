@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: shoapp
+
+server:
+  port: 8088
