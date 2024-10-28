@@ -1,5 +1,9 @@
 package com.example.shoapp.dtos;
 
+import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.Max;
@@ -29,4 +33,5 @@ public class ProductDTO {
     private String description;
     @JsonProperty("category_id")
     private String categoryId;
+    private List<MultipartFile> files;
 }
