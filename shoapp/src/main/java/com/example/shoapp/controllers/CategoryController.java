@@ -20,7 +20,7 @@ import com.example.shoapp.dtos.CategoryDTO;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("api/v1/categories")
+@RequestMapping("${api.prefix}/categories")
 public class CategoryController {
     @GetMapping("") // http://localhost:8088/api/v1/categories?page=1&limit=10
     public ResponseEntity<String> getAllCategory(@RequestParam("page") int page, @RequestParam("limit") int limit) {
