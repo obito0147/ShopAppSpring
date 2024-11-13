@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +34,10 @@ import com.example.shoapp.dtos.ProductDTO;
 import com.example.shoapp.dtos.ProductImageDTO;
 import com.example.shoapp.models.Product;
 import com.example.shoapp.models.ProductImage;
+import com.example.shoapp.responses.ProductListResponse;
+import com.example.shoapp.responses.ProductResponse;
 import com.example.shoapp.services.IProductService;
+import com.github.javafaker.Faker;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -126,8 +132,17 @@ public class ProductController {
     }
 
     @GetMapping("") // http://localhost:8088/api/v1/categories?page=1&limit=10
-    public ResponseEntity<String> getProducts(@RequestParam("page") int page, @RequestParam("limit") int limit) {
-        return ResponseEntity.ok(String.format("get products, page = %d, limit = %d", page, limit));
+    public ResponseEntity<ProductListResponse> getProducts(@RequestParam("page") int page,
+            @RequestParam("limit") int limit) {
+        PageRequest pageRequest = PageRequest.of(page, limit, Sort.by("createAt").descending());
+        Page<ProductResponse> productPage = productService.getAllProducts(pageRequest);
+        // lấy tổng số trang
+        int totalPage = productPage.getTotalPages();
+        List<ProductResponse> products = productPage.getContent();
+        return ResponseEntity.ok(ProductListResponse.builder()
+                .products(products)
+                .totalPages(totalPage)
+                .build());
     }
 
     @GetMapping("/{id}")
@@ -138,5 +153,14 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProductById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(String.format("delete product id is : %d", id));
+    }
+
+    @PostMapping("/generateFakeProducts")
+    public ResponseEntity<String> generateFakeProducts() {
+        Faker faker = new Faker();
+        for (int i = 0; i < 1000000; i++) {
+            String productName = faker.commerce().productName();
+            ProductDTO productDTO = ProductDTO.builder().build();
+        }
     }
 }

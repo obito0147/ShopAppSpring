@@ -8,6 +8,7 @@ import com.example.shoapp.dtos.ProductImageDTO;
 import com.example.shoapp.exceptions.DataNotFoundException;
 import com.example.shoapp.models.Product;
 import com.example.shoapp.models.ProductImage;
+import com.example.shoapp.responses.ProductResponse;
 
 @Service
 public interface IProductService {
@@ -15,7 +16,7 @@ public interface IProductService {
 
     Product getProductById(long id) throws Exception;
 
-    Page<Product> getAllProducts(PageRequest pageRequest);
+    Page<ProductResponse> getAllProducts(PageRequest pageRequest);
 
     Product updateProduct(long id, ProductDTO productDTO) throws Exception;
 

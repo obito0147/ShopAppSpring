@@ -16,6 +16,7 @@ import com.example.shoapp.models.ProductImage;
 import com.example.shoapp.repositories.CategoryRepository;
 import com.example.shoapp.repositories.ProductImageRepository;
 import com.example.shoapp.repositories.ProductRepository;
+import com.example.shoapp.responses.ProductResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -46,8 +47,19 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public Page<Product> getAllProducts(PageRequest pageRequest) {
-        return productRepository.findAll(pageRequest);
+    public Page<ProductResponse> getAllProducts(PageRequest pageRequest) {
+        return productRepository.findAll(pageRequest).map(product -> {
+            ProductResponse productResponse = ProductResponse.builder()
+                    .name(product.getName())
+                    .price(product.getPrice())
+                    .thumbnail(product.getThumbnail())
+                    .description(product.getDescription())
+                    .categoryId(product.getCategory().getId())
+                    .build();
+            productResponse.setCreateAt(product.getCreateAt());
+            productResponse.setUpdateAt(product.getUpdateAt());
+            return productResponse;
+        });
     }
 
     @Override
