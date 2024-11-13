@@ -45,10 +45,10 @@ public class User {
     private Date dateOfBirth;
 
     @Column(name = "facebook_account_id")
-    private Long facebookAccountId;
+    private int facebookAccountId;
 
     @Column(name = "google_account_id")
-    private Long googleAccountId;
+    private int googleAccountId;
 
     @ManyToOne
     @JoinColumn(name = "role_id")
