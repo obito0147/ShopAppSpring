@@ -32,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.shoapp.dtos.ProductDTO;
 import com.example.shoapp.dtos.ProductImageDTO;
+import com.example.shoapp.exceptions.DataNotFoundException;
 import com.example.shoapp.models.Product;
 import com.example.shoapp.models.ProductImage;
 import com.example.shoapp.responses.ProductListResponse;
@@ -160,7 +161,22 @@ public class ProductController {
         Faker faker = new Faker();
         for (int i = 0; i < 1000000; i++) {
             String productName = faker.commerce().productName();
-            ProductDTO productDTO = ProductDTO.builder().build();
+            if (productService.existsByName(productName)) {
+                continue;
+            }
+            ProductDTO productDTO = ProductDTO.builder()
+                    .name(productName)
+                    .price((float) faker.number().numberBetween(10, 90000000))
+                    .description(faker.lorem().sentence())
+                    .thumbnail("")
+                    .categoryId((long) faker.number().numberBetween(2, 4))
+                    .build();
+            try {
+                productService.createProduct(productDTO);
+            } catch (DataNotFoundException e) {
+                return ResponseEntity.badRequest().body(e.getMessage());
+            }
         }
+        return ResponseEntity.ok("Fake products created successfully");
     }
 }
