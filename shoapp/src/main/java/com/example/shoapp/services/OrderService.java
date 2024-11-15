@@ -54,27 +54,36 @@ public class OrderService implements IOrderService {
     }
 
     @Override
-    public OrderResponse getOrder(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getOrder'");
+    public Order getOrder(Long id) {
+        return orderRepository.findById(id).orElse(null);
     }
 
     @Override
-    public OrderResponse updateOrder(Long id, OrderDTO orderDTO) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateOrder'");
+    public Order updateOrder(Long id, OrderDTO orderDTO) throws Exception {
+        Order existingOrder = orderRepository.findById(id)
+                .orElseThrow(() -> new DataNotFoundException("Cannot find order"));
+        User existingUser = userRepository.findById(orderDTO.getUserId())
+                .orElseThrow(() -> new DataNotFoundException("Cannot find user"));
+        modelMapper.typeMap(OrderDTO.class, Order.class).addMappings(mapper -> mapper.skip(Order::setId));
+        // cap nhat cac truong cua don hang tu OrderDTO
+        modelMapper.map(orderDTO, existingOrder);
+        existingOrder.setUser(existingUser);
+        return orderRepository.save(existingOrder);
     }
 
     @Override
     public void deleteOrder(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteOrder'");
+        Order order = orderRepository.findById(id).orElseThrow(null);
+        // khong nen xoa cung chi nen xoa mem
+        if (order != null) {
+            order.setActive(false);
+            orderRepository.save(order);
+        }
     }
 
     @Override
-    public List<OrderResponse> getAllOrders(Long userId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAllOrders'");
+    public List<Order> findByUser(Long userId) {
+        return orderRepository.findByUserId(userId);
     }
 
 }
