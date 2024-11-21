@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.shoapp.dtos.UserDTO;
 import com.example.shoapp.dtos.UserLoginDTO;
+import com.example.shoapp.models.User;
 import com.example.shoapp.services.IUserService;
 
 import jakarta.validation.Valid;
@@ -34,8 +35,8 @@ public class UserController {
             if (!userDTO.getPassword().equals(userDTO.getRetypePassword())) {
                 return ResponseEntity.badRequest().body("password does not match");
             }
-            userService.createUser(userDTO);
-            return ResponseEntity.ok("dang ky thanh cong");
+            User user = userService.createUser(userDTO);
+            return ResponseEntity.ok(user);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -43,8 +44,12 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> createUser(@Valid @RequestBody UserLoginDTO userLoginDTO) {
-        String token = userService.login(userLoginDTO.getPhoneNumber(), userLoginDTO.getPassword());
-        return ResponseEntity.ok("dang nhap thanh cong");
+        try {
+            String token = userService.login(userLoginDTO.getPhoneNumber(), userLoginDTO.getPassword());
+            return ResponseEntity.ok(token);
 
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

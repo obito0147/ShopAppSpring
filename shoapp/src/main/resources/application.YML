@@ -2,7 +2,7 @@ spring:
   application:
     name: shoapp
   datasource:
-    url: jdbc:mysql://localhost:3306/shopapp?useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/shoapp?useSSL=false&serverTimezone=UTC
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: 
@@ -12,7 +12,7 @@ spring:
         ddl-auto: none
       properties:
         hibernate:
-          dialect: org.hibernate.dialect.MySQL8Dialect
+          dialect: org.hibernate.dialect.MySQL5Dialect
           format_sql: true
   servlet:
     multipart:
@@ -24,3 +24,6 @@ server:
 
 api:
   prefix: api/v1
+jwt:
+  expiration: 2592000
+  secretKey: Jwi+cjscdAFS1YFgn2Yb02mHd1AAzQioRwK+sGWYnNY=

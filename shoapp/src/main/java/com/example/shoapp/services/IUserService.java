@@ -7,5 +7,5 @@ import com.example.shoapp.models.User;
 public interface IUserService {
     User createUser(UserDTO userDTO) throws DataNotFoundException;
 
-    String login(String username, String password);
+    String login(String phoneNumber, String password) throws Exception;
 }
