@@ -10,6 +10,7 @@ import java.util.Base64.Decoder;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import com.example.shoapp.exceptions.InvalidParamException;
@@ -26,8 +27,8 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class JwtTokenUtil {
-    @Value("${jwt.expiration}")
-    private int expiration;
+    // @Value("${jwt.expiration}")
+    private int expiration = 2592000;
 
     @Value("${jwt.secretKey}")
     private String secretKey;
@@ -35,14 +36,14 @@ public class JwtTokenUtil {
     public String generateToken(User user) throws Exception {
         Map<String, Object> claims = new HashMap<>();
         // this.generateSecretKey();
-        claims.put("phoneNUmber", user.getPhoneNumber());
+        claims.put("phoneNumber", user.getPhoneNumber());
         try {
             String token = Jwts.builder()
                     .setClaims(claims)
                     .setSubject(user.getPhoneNumber())
-                    .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000)) // * 1000 de doi tu giay
-                                                                                             // sang
-                                                                                             // m giay L la kieu Long
+                    .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000L)) // * 1000 de doi tu giay
+                                                                                              // sang
+                                                                                              // m giay L la kieu Long
                     .signWith(getSignInkey(), SignatureAlgorithm.HS256)
 
                     .compact();
@@ -66,7 +67,11 @@ public class JwtTokenUtil {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder().setSigningKey(getSignInkey()).build().parseClaimsJws(token).getBody();
+        return Jwts.parserBuilder()
+                .setSigningKey(getSignInkey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
@@ -79,7 +84,13 @@ public class JwtTokenUtil {
         return expirationDate.before(new Date());
     }
 
-    public String extractPhoneNumber(String token){
+    public String extractPhoneNumber(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    // kiểm tra username và token còn hạn hay không
+    public boolean validateToken(String token, UserDetails userDetails) {
+        String phoneNumber = extractPhoneNumber(token);
+        return (phoneNumber.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 }
