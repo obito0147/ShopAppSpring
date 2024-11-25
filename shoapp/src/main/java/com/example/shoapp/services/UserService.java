@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.example.shoapp.component.JwtTokenUtil;
 import com.example.shoapp.dtos.UserDTO;
 import com.example.shoapp.exceptions.DataNotFoundException;
+import com.example.shoapp.exceptions.PermissionDenyException;
 import com.example.shoapp.models.Role;
 import com.example.shoapp.models.User;
 import com.example.shoapp.repositories.RoleRepository;
@@ -29,10 +30,15 @@ public class UserService implements IUserService {
     private final AuthenticationManager authenticationManager;
 
     @Override
-    public User createUser(UserDTO userDTO) throws DataNotFoundException {
+    public User createUser(UserDTO userDTO) throws Exception {
         String phoneNumber = userDTO.getPhoneNumber();
         if (userRepository.existsByPhoneNumber(phoneNumber)) {
             throw new DataIntegrityViolationException("Phone number already exists");
+        }
+        Role role = roleRepository.findById(userDTO.getRoleId())
+                .orElseThrow(() -> new DataNotFoundException("Role not found"));
+        if (role.getName().toUpperCase().equals(Role.ADMIN)) {
+            throw new PermissionDenyException("You cannot register an admin account");
         }
         // convert userdto => user
         User newUser = User.builder()
@@ -43,8 +49,7 @@ public class UserService implements IUserService {
                 .facebookAccountId(userDTO.getFacebookAccountId())
                 .googleAccountId(userDTO.getGoogleAccountId())
                 .build();
-        Role role = roleRepository.findById(userDTO.getRoleId())
-                .orElseThrow(() -> new DataNotFoundException("Role not found"));
+
         newUser.setRole(role);
         // nếu sử dụng google hoặc facebook thì không yêu cầu mật khẩu
         if (userDTO.getFacebookAccountId() == 0 && userDTO.getGoogleAccountId() == 0) {

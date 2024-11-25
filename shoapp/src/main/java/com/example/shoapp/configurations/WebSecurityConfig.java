@@ -11,6 +11,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.example.shoapp.filters.JwtTokenFilter;
+import com.example.shoapp.models.Role;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,18 +33,58 @@ public class WebSecurityConfig {
                                                                         String.format("%s/users/register", apiPrefix),
                                                                         String.format("%s/users/login", apiPrefix))
                                                         .permitAll()
+                                                        // CATEGORY
+                                                        .requestMatchers(HttpMethod.GET,
+                                                                        String.format("%s/categories**", apiPrefix))
+                                                        .hasAnyRole(Role.USER, Role.ADMIN)
+                                                        .requestMatchers(HttpMethod.POST,
+                                                                        String.format("%s/categories/**", apiPrefix))
+                                                        .hasRole(Role.ADMIN)
+                                                        .requestMatchers(HttpMethod.PUT,
+                                                                        String.format("%s/categories/**", apiPrefix))
+                                                        .hasRole(Role.ADMIN)
+                                                        .requestMatchers(HttpMethod.DELETE,
+                                                                        String.format("%s/categories/**", apiPrefix))
+                                                        .hasRole(Role.ADMIN)
+                                                        // PRODUCT
+                                                        .requestMatchers(HttpMethod.GET,
+                                                                        String.format("%s/products**", apiPrefix))
+                                                        .hasAnyRole(Role.USER, Role.ADMIN)
+                                                        .requestMatchers(HttpMethod.POST,
+                                                                        String.format("%s/products/**", apiPrefix))
+                                                        .hasRole(Role.ADMIN)
+                                                        .requestMatchers(HttpMethod.PUT,
+                                                                        String.format("%s/products/**", apiPrefix))
+                                                        .hasRole(Role.ADMIN)
+                                                        .requestMatchers(HttpMethod.DELETE,
+                                                                        String.format("%s/products/**", apiPrefix))
+                                                        .hasRole(Role.ADMIN)
+                                                        // ORDER
                                                         .requestMatchers(HttpMethod.POST,
                                                                         String.format("%s/orders/**", apiPrefix))
-                                                        .hasRole("USER")
+                                                        .hasRole(Role.USER)
                                                         .requestMatchers(HttpMethod.GET,
                                                                         String.format("%s/orders/**", apiPrefix))
-                                                        .hasAnyRole("USER", "ADMIN")
+                                                        .hasAnyRole(Role.USER, Role.ADMIN)
                                                         .requestMatchers(HttpMethod.PUT,
                                                                         String.format("%s/orders/**", apiPrefix))
-                                                        .hasRole("ADMIN")
+                                                        .hasRole(Role.ADMIN)
                                                         .requestMatchers(HttpMethod.DELETE,
                                                                         String.format("%s/orders/**", apiPrefix))
-                                                        .hasRole("ADMIN")
+                                                        .hasRole(Role.ADMIN)
+                                                        // ORDER DETAIL
+                                                        .requestMatchers(HttpMethod.GET,
+                                                                        String.format("%s/order_details/**", apiPrefix))
+                                                        .hasAnyRole(Role.USER)
+                                                        .requestMatchers(HttpMethod.POST,
+                                                                        String.format("%s/order_details/**", apiPrefix))
+                                                        .hasRole(Role.USER)
+                                                        .requestMatchers(HttpMethod.PUT,
+                                                                        String.format("%s/order_details/**", apiPrefix))
+                                                        .hasRole(Role.USER)
+                                                        .requestMatchers(HttpMethod.DELETE,
+                                                                        String.format("%s/order_details/**", apiPrefix))
+                                                        .hasRole(Role.USER)
                                                         .anyRequest().authenticated();
                                 });
 
