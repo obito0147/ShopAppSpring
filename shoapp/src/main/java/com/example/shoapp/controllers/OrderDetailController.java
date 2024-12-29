@@ -14,6 +14,7 @@ import com.example.shoapp.dtos.OrderDetailDTO;
 import com.example.shoapp.models.OrderDetail;
 import com.example.shoapp.responses.OrderDetailResponse;
 import com.example.shoapp.services.IOderDetailService;
+import com.example.shoapp.utils.LocalizationUtils;
 
 import java.util.*;
 import jakarta.validation.Valid;
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class OrderDetailController {
     private final IOderDetailService oderDetailService;
+    private final LocalizationUtils localizationUtils;
 
     @PostMapping("")
     public ResponseEntity<?> createOrderDetail(@Valid @RequestBody OrderDetailDTO orderDetailDTO) {

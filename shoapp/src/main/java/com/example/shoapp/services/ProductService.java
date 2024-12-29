@@ -18,6 +18,7 @@ import com.example.shoapp.repositories.ProductImageRepository;
 import com.example.shoapp.repositories.ProductRepository;
 import com.example.shoapp.responses.ProductResponse;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -28,6 +29,7 @@ public class ProductService implements IProductService {
     private final ProductImageRepository productImageRepository;
 
     @Override
+    @Transactional
     public Product createProduct(ProductDTO productDTO) throws DataNotFoundException {
         Category existingCategory = categoryRepository.findById(productDTO.getCategoryId()).orElseThrow(
                 () -> new DataNotFoundException("Cannot find category with id: " + productDTO.getCategoryId()));
@@ -53,6 +55,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
+    @Transactional
     public Product updateProduct(long id, ProductDTO productDTO) throws Exception {
         Product existingProduct = getProductById(id);
         if (existingProduct != null) {
@@ -69,6 +72,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
+    @Transactional
     public void deleteProduct(long id) {
         Optional<Product> optionalProduct = productRepository.findById(id);
         if (optionalProduct.isPresent()) {
@@ -83,6 +87,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
+    @Transactional
     public ProductImage createProductImage(Long productId, ProductImageDTO productImageDTO) throws Exception {
         Product existingProduct = productRepository.findById(productId).orElseThrow(
                 () -> new DataNotFoundException("Cannot find product with id: " + productImageDTO.getProductId()));

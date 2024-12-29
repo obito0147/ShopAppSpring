@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.shoapp.dtos.OrderDTO;
 import com.example.shoapp.models.Order;
-import com.example.shoapp.responses.OrderResponse;
 import com.example.shoapp.services.IOrderService;
+import com.example.shoapp.utils.LocalizationUtils;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class OrderController {
     private final IOrderService orderService;
+    private final LocalizationUtils localizationUtils;
 
     @PostMapping("")
     public ResponseEntity<?> createOrder(@Valid @RequestBody OrderDTO orderDTO, BindingResult result) {

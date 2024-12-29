@@ -13,6 +13,7 @@ import com.example.shoapp.repositories.OrderDetailRepository;
 import com.example.shoapp.repositories.OrderRepository;
 import com.example.shoapp.repositories.ProductRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -23,6 +24,7 @@ public class OrderDetailService implements IOderDetailService {
         private final ProductRepository productRepository;
 
         @Override
+        @Transactional
         public OrderDetail createOrderDetail(OrderDetailDTO newOrderDetailDTO) throws Exception {
                 // kiem tra order co ton tai khong
                 Order order = orderRepository.findById(newOrderDetailDTO.getOrderId())
@@ -50,6 +52,7 @@ public class OrderDetailService implements IOderDetailService {
         }
 
         @Override
+        @Transactional
         public OrderDetail updateOrderDetail(Long id, OrderDetailDTO orderDetailDTO) throws Exception {
                 // kiem tra orderdetail co ton tai khong
                 OrderDetail orderDetail = orderDetailRepository.findById(id)
@@ -71,6 +74,7 @@ public class OrderDetailService implements IOderDetailService {
         }
 
         @Override
+        @Transactional
         public void deleteOrderDetail(Long id) {
                 orderDetailRepository.deleteById(id);
         }

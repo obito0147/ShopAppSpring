@@ -2,13 +2,13 @@ package com.example.shoapp.services;
 
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.stereotype.Service; 
 
 import com.example.shoapp.dtos.CategoryDTO;
 import com.example.shoapp.models.Category;
 import com.example.shoapp.repositories.CategoryRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -17,6 +17,7 @@ public class CategoryService implements ICategoryService {
     private final CategoryRepository categoryRepository;
 
     @Override
+    @Transactional
     public Category createCategory(CategoryDTO categoryDTO) {
         Category newCategory = Category.builder()
                 .name(categoryDTO.getName()).build();
@@ -34,6 +35,7 @@ public class CategoryService implements ICategoryService {
     }
 
     @Override
+    @Transactional
     public Category updateCategory(long id, CategoryDTO categoryDTO) {
         Category existingCategory = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Not found category"));
@@ -43,6 +45,7 @@ public class CategoryService implements ICategoryService {
     }
 
     @Override
+    @Transactional
     public void deleteCategory(long id) {
         categoryRepository.deleteById(id);
     }

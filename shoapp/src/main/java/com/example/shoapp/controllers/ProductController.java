@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -20,7 +21,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,6 +38,7 @@ import com.example.shoapp.models.ProductImage;
 import com.example.shoapp.responses.ProductListResponse;
 import com.example.shoapp.responses.ProductResponse;
 import com.example.shoapp.services.IProductService;
+import com.example.shoapp.utils.LocalizationUtils;
 import com.github.javafaker.Faker;
 
 import jakarta.validation.Valid;
@@ -48,6 +49,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProductController {
     private final IProductService productService;
+    private final LocalizationUtils localizationUtils;
 
     @PostMapping(value = "")
     public ResponseEntity<?> insertProduct(@Valid @RequestBody ProductDTO productDTO,
@@ -70,7 +72,7 @@ public class ProductController {
         }
     }
 
-    @PostMapping(value = "uploads/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/uploads/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadImages(@PathVariable("id") Long productId,
             @RequestPart("files") List<MultipartFile> files) {
         try {
@@ -107,6 +109,23 @@ public class ProductController {
 
     }
 
+    @GetMapping("/images/{name}")
+    public ResponseEntity<?> viewImage(@PathVariable("name") String imageName) {
+        try {
+            Path imagePath = Paths.get("shoapp/uploads/" + imageName);
+            UrlResource resource = new UrlResource(imagePath.toUri());
+            if (resource.exists()) {
+                return ResponseEntity.ok()
+                        .contentType(MediaType.IMAGE_JPEG)
+                        .body(resource);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     private String storeFile(MultipartFile file) throws IOException {
         if (!isImageFile(file) && file.getOriginalFilename() == null) {
             throw new IOException("Invalid image format");
@@ -135,7 +154,7 @@ public class ProductController {
     @GetMapping("") // http://localhost:8088/api/v1/categories?page=1&limit=10
     public ResponseEntity<ProductListResponse> getProducts(@RequestParam("page") int page,
             @RequestParam("limit") int limit) {
-        PageRequest pageRequest = PageRequest.of(page, limit, Sort.by("createAt").descending());
+        PageRequest pageRequest = PageRequest.of(page, limit, Sort.by("id").ascending());
         Page<ProductResponse> productPage = productService.getAllProducts(pageRequest);
         // lấy tổng số trang
         int totalPage = productPage.getTotalPages();

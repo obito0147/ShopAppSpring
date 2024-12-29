@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.shoapp.dtos.CategoryDTO;
 import com.example.shoapp.models.Category;
+import com.example.shoapp.responses.UpdateCategoryResponse;
 import com.example.shoapp.services.ICategoryService;
+import com.example.shoapp.utils.LocalizationUtils;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 public class CategoryController {
 
     private final ICategoryService categoryService;
+    private final LocalizationUtils localizationUtils;
 
     @GetMapping("") // http://localhost:8088/api/v1/categories?page=1&limit=10
     public ResponseEntity<List<Category>> getAllCategory(@RequestParam("page") int page,
@@ -51,9 +54,12 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateCategory(@PathVariable Long id, @Valid @RequestBody CategoryDTO categoryDTO) {
+    public ResponseEntity<UpdateCategoryResponse> updateCategory(@PathVariable Long id,
+            @Valid @RequestBody CategoryDTO categoryDTO) {
         categoryService.updateCategory(id, categoryDTO);
-        return ResponseEntity.ok("update category successfully");
+        return ResponseEntity.ok(UpdateCategoryResponse.builder()
+                .message(localizationUtils.getLocalizedMessage("category.update.update_successfully"))
+                .build());
     }
 
     @DeleteMapping("/{id}")

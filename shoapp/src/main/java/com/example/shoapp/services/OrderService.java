@@ -3,7 +3,6 @@ package com.example.shoapp.services;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -15,8 +14,8 @@ import com.example.shoapp.models.OrderStatus;
 import com.example.shoapp.models.User;
 import com.example.shoapp.repositories.OrderRepository;
 import com.example.shoapp.repositories.UserRepository;
-import com.example.shoapp.responses.OrderResponse;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -27,6 +26,7 @@ public class OrderService implements IOrderService {
     private final ModelMapper modelMapper;
 
     @Override
+    @Transactional
     public Order createOrder(OrderDTO orderDTO) throws Exception {
         // kiem tra user co ton tai khong
         User user = userRepository
@@ -59,6 +59,7 @@ public class OrderService implements IOrderService {
     }
 
     @Override
+    @Transactional
     public Order updateOrder(Long id, OrderDTO orderDTO) throws Exception {
         Order existingOrder = orderRepository.findById(id)
                 .orElseThrow(() -> new DataNotFoundException("Cannot find order"));
@@ -72,6 +73,7 @@ public class OrderService implements IOrderService {
     }
 
     @Override
+    @Transactional
     public void deleteOrder(Long id) {
         Order order = orderRepository.findById(id).orElseThrow(null);
         // khong nen xoa cung chi nen xoa mem

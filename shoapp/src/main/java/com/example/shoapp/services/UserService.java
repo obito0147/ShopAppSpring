@@ -17,7 +17,10 @@ import com.example.shoapp.models.Role;
 import com.example.shoapp.models.User;
 import com.example.shoapp.repositories.RoleRepository;
 import com.example.shoapp.repositories.UserRepository;
+import com.example.shoapp.utils.LocalizationUtils;
+import com.example.shoapp.utils.MessageKeys;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -28,8 +31,10 @@ public class UserService implements IUserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenUtil jwtTokenUtil;
     private final AuthenticationManager authenticationManager;
+    private final LocalizationUtils localizationUtils;
 
     @Override
+    @Transactional
     public User createUser(UserDTO userDTO) throws Exception {
         String phoneNumber = userDTO.getPhoneNumber();
         if (userRepository.existsByPhoneNumber(phoneNumber)) {
@@ -61,7 +66,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public String login(String phoneNumber, String password) throws Exception {
+    public String login(String phoneNumber, String password, Long roleId) throws Exception {
         Optional<User> optionalUser = userRepository.findByPhoneNumber(phoneNumber);
         if (optionalUser.isEmpty()) {
             throw new DataNotFoundException("Invalid phonenumber or password");
@@ -71,6 +76,10 @@ public class UserService implements IUserService {
             if (!passwordEncoder.matches(password, existingUser.getPassword())) {
                 throw new BadCredentialsException("Wrong phone number or password");
             }
+        }
+        Optional<Role> optionalRole = roleRepository.findById(roleId);
+        if (optionalRole.isEmpty() || !roleId.equals(existingUser.getRole().getId())) {
+            throw new DataNotFoundException(localizationUtils.getLocalizedMessage(MessageKeys.ROLE_DOES_NOT_EXISTS));
         }
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(phoneNumber,
                 password, existingUser.getAuthorities());
